@@ -1,0 +1,11 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/CRMProject/CRMProject/obj
+/CRMProject/DataAcccess/obj
+/CRMProject/CRMProject/bin
+/CRMProject/DataAcccess/bin
+/CRMProject/CRMProject/obj
+/CRMProject/.vs/CRMProject/FileContentIndex
+/CRMProject/.vs/CRMProject/v17
