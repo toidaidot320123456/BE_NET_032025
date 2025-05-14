@@ -2,7 +2,9 @@
 using CRMProject.AutoMapper;
 using CRMProject.Middleware;
 using DataAcccess.DBContext;
+using DataAcccess.IRepositories;
 using DataAcccess.IServices;
+using DataAcccess.Repositories;
 using DataAcccess.Services;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
@@ -27,6 +29,7 @@ builder.Services.AddDbContext<BE_NET_032025Context>(options =>
 builder.Services.AddStackExchangeRedisCache(options => { options.Configuration = configuration["RedisCacheUrl"]; });
 
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
+builder.Services.AddScoped<IProductService, ProductService>();
 
 //Auto Mapper Configurations
 var mapperConfig = new MapperConfiguration(mc =>
@@ -50,7 +53,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-app.UseMiddleware<ExceptionHandlingMiddleware>();
+//app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseHttpsRedirection();
 
 app.UseAuthorization();

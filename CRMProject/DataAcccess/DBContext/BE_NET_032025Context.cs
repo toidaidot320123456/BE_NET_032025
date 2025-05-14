@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Castle.Core.Configuration;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
@@ -8,16 +7,13 @@ namespace DataAcccess.DBContext
 {
     public partial class BE_NET_032025Context : DbContext
     {
-        private readonly IConfiguration _configuration;
-        public BE_NET_032025Context(IConfiguration configuration)
+        public BE_NET_032025Context()
         {
-            _configuration = configuration;
         }
 
         public BE_NET_032025Context(DbContextOptions<BE_NET_032025Context> options)
             : base(options)
         {
-
         }
 
         public virtual DbSet<Product> Products { get; set; } = null!;
@@ -35,11 +31,7 @@ namespace DataAcccess.DBContext
         {
             modelBuilder.Entity<Product>(entity =>
             {
-                entity.HasNoKey();
-
-                entity.Property(e => e.Id)
-                    .ValueGeneratedOnAdd()
-                    .HasColumnName("ID");
+                entity.Property(e => e.Id).HasColumnName("ID");
 
                 entity.Property(e => e.ImagePath)
                     .HasMaxLength(255)
