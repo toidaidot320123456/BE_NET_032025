@@ -5,46 +5,45 @@ using DataAcccess.RequestData;
 
 namespace DataAcccess.Services
 {
-    public class ProductService : IProductService
+    public class ProductService : GenericService<Product, int>, IProductService
     {
         private IProductRepository _productRepository;
         public ProductService(IProductRepository productRepository)
         {
             _productRepository = productRepository;
         }
-        public Task<int> Insert(CreateProduct productRequest)
+        public async Task<int> Insert(CreateProduct productRequest)
         {
             var product = new Product()
             {
                 ProductName = productRequest.ProductName,
-                ImagePath = productRequest.ImagePath,
-                Price = productRequest.Price
+                UnitPrice = productRequest.UnitPrice,
+                StockQuantity = productRequest.StockQuantity
             };
-            return _productRepository.Insert(product);
+            _productRepository.Insert(product);
+            return await _productRepository.SaveChanges();
         }
-        public Task<int> Update(EditProduct productRequest)
+        public async Task<int> Update(EditProduct productRequest)
         {
             var product = new Product()
             {
                 ProductName = productRequest.ProductName,
-                ImagePath = productRequest.ImagePath,
-                Price = productRequest.Price,
-                Id = productRequest.Id
+                UnitPrice = productRequest.UnitPrice,
+                StockQuantity = productRequest.StockQuantity,
+                ProductId = productRequest.ProductId
             };
-            return _productRepository.Update(product);
+            _productRepository.Update(product);
+            return await _productRepository.SaveChanges();
         }
-        public Task<int> Remove(int id)
+        public async Task<int> Remove(int id)
         {
             var product = _productRepository.GetById(id);
             if (product != null)
-            {               
-                return _productRepository.Remove(product);
+            {
+                _productRepository.Remove(product);
+                return await _productRepository.SaveChanges();
             }
-            return Task.FromResult(0);
-        }
-        public async Task<List<Product>> GetAll()
-        {
-            return await _productRepository.GetAll();
+            return await Task.FromResult(0);
         }
     }
 }

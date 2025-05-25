@@ -13,29 +13,36 @@ namespace DataAcccess.Repositories
         {
             _context = context;
         }
-
-        public async Task<List<T>> GetAll()
+        public T Insert(T entity)
         {
-            return _context.Set<T>().ToList();
+            _context.Add(entity);
+            return entity;
         }
-        public async Task<int> Insert(T t)
+        public T Update(T entity)
         {
-            _context.Add(t);
-            return _context.SaveChanges();
+            _context.Update(entity);
+            return entity;
         }
-        public async Task<int> Update(T t)
-        {
-            _context.Update(t);
-            return _context.SaveChanges();
-        }
-        public async Task<int> Remove(T t)
+        public void Remove(T t)
         {
             _context.Remove(t);
-            return _context.SaveChanges();
         }
+
         public T GetById(IdT id)
         {
             return _set.Find(id);
+        }
+        public async Task<List<T>> GetAll()
+        {
+            return _context.Set<T>().AsNoTracking().ToList();
+        }
+        public async Task<int> SaveChanges()
+        {
+            return _context.SaveChanges();
+        }
+        public async Task<int> SaveChangesAsync()
+        {
+            return await _context.SaveChangesAsync();
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using CRMProject;
 using CRMProject.AutoMapper;
 using CRMProject.Middleware;
 using DataAcccess.DBContext;
@@ -6,8 +7,11 @@ using DataAcccess.IRepositories;
 using DataAcccess.IServices;
 using DataAcccess.Repositories;
 using DataAcccess.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Serilog;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,7 +20,6 @@ builder.Host.UseSerilog((context, configuration) =>
     configuration.ReadFrom.Configuration(context.Configuration));
 
 // Add services to the container.
-
 builder.Services.AddControllers();
 
 // Add services to the container
@@ -28,8 +31,26 @@ builder.Services.AddDbContext<BE_NET_032025Context>(options =>
 //Add Redis
 builder.Services.AddStackExchangeRedisCache(options => { options.Configuration = configuration["RedisCacheUrl"]; });
 
-builder.Services.AddScoped<IProductRepository, ProductRepository>();
-builder.Services.AddScoped<IProductService, ProductService>();
+//Add Repository
+builder.Services.AddRepositoryService();
+
+//Add Service
+builder.Services.AddServiceRegistrations();
+
+//Add JWT
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = configuration["Jwt:ValidIssuer"],
+        ValidAudience = configuration["Jwt:ValidAudience"],
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:SecretKey"]))
+    };
+});
 
 //Auto Mapper Configurations
 var mapperConfig = new MapperConfiguration(mc =>
@@ -53,9 +74,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-//app.UseMiddleware<ExceptionHandlingMiddleware>();
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseHttpsRedirection();
 
+//app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

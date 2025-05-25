@@ -5,9 +5,16 @@ namespace DataAcccess.DBContext
 {
     public partial class Product
     {
-        public int Id { get; set; }
+        public Product()
+        {
+            OrdersDetails = new HashSet<OrdersDetail>();
+        }
+
+        public int ProductId { get; set; }
         public string? ProductName { get; set; }
-        public double? Price { get; set; }
-        public string? ImagePath { get; set; }
+        public double? UnitPrice { get; set; }
+        public double? StockQuantity { get; set; }
+
+        public virtual ICollection<OrdersDetail> OrdersDetails { get; set; }
     }
 }
