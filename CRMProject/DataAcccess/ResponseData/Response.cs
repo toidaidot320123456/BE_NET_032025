@@ -46,7 +46,8 @@
         public const string SuccessAction = "Action completed successfully.";
         public const string FailureAction = "Action failed.";
         public const string InvalidToken = "The token or refresh token is invalid.";
-        
+        public const string NotEnoughStock = "Not enough stock";
+
     }
 
     public static class StatusResponse

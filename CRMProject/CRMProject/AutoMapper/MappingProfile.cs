@@ -10,9 +10,12 @@ namespace CRMProject.AutoMapper
         {
             CreateMap<Product, ProductDTO>();
             CreateMap<ProductDTO, Product>();
+
             CreateMap<Customer, CustomerDTO>();
             CreateMap<CustomerDTO, Customer>();
 
+            CreateMap<Order, OrderDTO>();
+            CreateMap<OrderDTO, Order>();
         }
     }
 }
