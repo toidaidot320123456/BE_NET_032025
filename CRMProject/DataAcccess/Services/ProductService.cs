@@ -11,6 +11,7 @@ namespace DataAcccess.Services
         public ProductService(IProductRepository productRepository)
         {
             _productRepository = productRepository;
+            _genericRepository = productRepository;
         }
         public async Task<int> Insert(CreateProduct productRequest)
         {

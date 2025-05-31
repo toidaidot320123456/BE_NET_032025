@@ -15,7 +15,6 @@ namespace DataAcccess.RequestData
     }
     public class CreateProduct
     {
-        public int ProductId { get; set; }
         [Required(ErrorMessage = "ProductName is required")]
         [StringLength(50, MinimumLength = 3, ErrorMessage = "ProductName must be between 3 and 50 characters")]
         public string ProductName { get; set; }

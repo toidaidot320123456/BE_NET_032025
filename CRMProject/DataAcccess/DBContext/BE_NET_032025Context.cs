@@ -17,8 +17,10 @@ namespace DataAcccess.DBContext
         }
 
         public virtual DbSet<Customer> Customers { get; set; } = null!;
+        public virtual DbSet<Function> Functions { get; set; } = null!;
         public virtual DbSet<Order> Orders { get; set; } = null!;
         public virtual DbSet<OrdersDetail> OrdersDetails { get; set; } = null!;
+        public virtual DbSet<Permission> Permissions { get; set; } = null!;
         public virtual DbSet<Product> Products { get; set; } = null!;
         public virtual DbSet<User> Users { get; set; } = null!;
 
@@ -48,6 +50,17 @@ namespace DataAcccess.DBContext
                 entity.Property(e => e.Email)
                     .HasMaxLength(255)
                     .IsUnicode(false);
+            });
+
+            modelBuilder.Entity<Function>(entity =>
+            {
+                entity.Property(e => e.FunctionId).HasColumnName("FunctionID");
+
+                entity.Property(e => e.FunctionCode)
+                    .HasMaxLength(255)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.FunctionName).HasMaxLength(255);
             });
 
             modelBuilder.Entity<Order>(entity =>
@@ -86,6 +99,25 @@ namespace DataAcccess.DBContext
                     .WithMany(p => p.OrdersDetails)
                     .HasForeignKey(d => d.ProductId)
                     .HasConstraintName("FK__OrdersDet__Produ__46E78A0C");
+            });
+
+            modelBuilder.Entity<Permission>(entity =>
+            {
+                entity.Property(e => e.PermissionId).HasColumnName("PermissionID");
+
+                entity.Property(e => e.FunctionId).HasColumnName("FunctionID");
+
+                entity.Property(e => e.UserId).HasColumnName("UserID");
+
+                entity.HasOne(d => d.Function)
+                    .WithMany(p => p.Permissions)
+                    .HasForeignKey(d => d.FunctionId)
+                    .HasConstraintName("FK__Permissio__Funct__4BAC3F29");
+
+                entity.HasOne(d => d.User)
+                    .WithMany(p => p.Permissions)
+                    .HasForeignKey(d => d.UserId)
+                    .HasConstraintName("FK__Permissio__UserI__4CA06362");
             });
 
             modelBuilder.Entity<Product>(entity =>

@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace CRMProject.Controllers
 {
     [Route("api/[controller]")]
-    public class OrderController : ControllerBase
+    public class OrderController : BaseController
     {
         private readonly IOrderService _orderService;
         public readonly IMapper _mapper;

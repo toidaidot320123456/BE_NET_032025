@@ -5,6 +5,11 @@ namespace DataAcccess.DBContext
 {
     public partial class User
     {
+        public User()
+        {
+            Permissions = new HashSet<Permission>();
+        }
+
         public int Id { get; set; }
         public string UserName { get; set; } = null!;
         public string Password { get; set; } = null!;
@@ -13,5 +18,7 @@ namespace DataAcccess.DBContext
         public DateTime? ExpriedTime { get; set; }
         public string? RefreshToken { get; set; }
         public bool? IsAdmin { get; set; }
+
+        public virtual ICollection<Permission> Permissions { get; set; }
     }
 }

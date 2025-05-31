@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using DataAcccess.Common;
 using DataAcccess.DTO;
 using DataAcccess.IServices;
 using DataAcccess.RequestData;
@@ -9,13 +8,13 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
-using System.Security.Principal;
 using System.Text;
 
 namespace CRMProject.Controllers
 {
     [Route("api/[controller]")]
-    public class UserController : ControllerBase
+    //[ApiController]
+    public class UserController : BaseController
     {
         private readonly IUserService _userService;
         public readonly IMapper _mapper;
@@ -41,7 +40,8 @@ namespace CRMProject.Controllers
                 var authClaims = new List<Claim>
                 {
                     new Claim(ClaimTypes.Name, result.UserName),
-                    new Claim(ClaimTypes.PrimarySid, result.Id.ToString())
+                    new Claim(ClaimTypes.PrimarySid, result.Id.ToString()),
+                    new Claim(ClaimTypes.IsPersistent, result.IsAdmin.ToString())
                 };
 
                 var tokenNew = CreateToken(authClaims);
@@ -49,8 +49,9 @@ namespace CRMProject.Controllers
 
                 var refreshToken = GenerateRefreshToken();
                 var expiredRefreshToken = DateTime.Now.AddDays(Convert.ToInt32(_configuration["JWT:RefreshTokenValidityInDays"]));
-                await _userService.UpdateRefreshToken(new UserDTO() { 
-                    UserName = result.UserName, 
+                await _userService.UpdateRefreshToken(new UserDTO()
+                {
+                    UserName = result.UserName,
                     ExpriedTime = expiredRefreshToken,
                     RefreshToken = refreshToken,
                 });
@@ -108,7 +109,7 @@ namespace CRMProject.Controllers
             {
                 var userName = claimsPrincipal.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Name)?.Value;
                 var userDTO = await _userService.GetByUserName(userName);
-                if(userDTO == null || userDTO.RefreshToken != tokenRequest.RefreshToken || userDTO.ExpriedTime < DateTime.Now)
+                if (userDTO == null || userDTO.RefreshToken != tokenRequest.RefreshToken || userDTO.ExpriedTime < DateTime.Now)
                 {
                     return BadRequest(MessageResponse.InvalidToken);
                 }

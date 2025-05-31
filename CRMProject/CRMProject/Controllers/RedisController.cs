@@ -7,7 +7,7 @@
 //{
 //    [Route("api/[controller]")]
 //    [ApiController]
-//    public class RedisController : ControllerBase
+//    public class RedisController : BaseController
 //    {
 //        private readonly IDistributedCache _distributedCache;
 //        public RedisController(IDistributedCache distributedCache)
@@ -34,7 +34,7 @@
 //            {
 //                DistributedCacheEntryOptions options = new DistributedCacheEntryOptions();
 //                options.SetAbsoluteExpiration(DateTime.Now.AddMinutes(5));
-                
+
 //                //chuỗi
 //                string chuoi = "Chuỗi dữ liệu";
 //                var dataToCache = Encoding.UTF8.GetBytes(chuoi);

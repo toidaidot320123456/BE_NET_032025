@@ -3,13 +3,10 @@ using CRMProject;
 using CRMProject.AutoMapper;
 using CRMProject.Middleware;
 using DataAcccess.DBContext;
-using DataAcccess.IRepositories;
-using DataAcccess.IServices;
-using DataAcccess.Repositories;
-using DataAcccess.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using Serilog;
 using System.Text;
 
@@ -42,13 +39,19 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
 {
     options.TokenValidationParameters = new TokenValidationParameters
     {
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
-        ValidIssuer = configuration["Jwt:ValidIssuer"],
-        ValidAudience = configuration["Jwt:ValidAudience"],
+        ValidateIssuer = true,//tự động kiểm tra nhà phát hành token
+        ValidIssuer = configuration["Jwt:ValidIssuer"],//tên nhà phát hành được cấu hình trong file appsettings.json
+
+        ValidateAudience = true,//tự động kiểm tra người được sử dụng token
+        ValidAudience = configuration["Jwt:ValidAudience"],//tên người được sử dụng token
+
+        ValidateLifetime = true,//tự động kiểm tra thời hạn của token
+        ClockSkew = TimeSpan.Zero,// bỏ thời gian trễ mặc định (5 phút)
+
+        ValidateIssuerSigningKey = true,//tự động kiểm tra với SecretKey 
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:SecretKey"]))
+
+        //sử dụng Middleware app.UseAuthentication(); thì tất cả việc kiểm tra mới được thực hiện
     };
 });
 
@@ -63,12 +66,42 @@ builder.Services.AddSingleton(mapper);
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+//builder.Services.AddSwaggerGen();
+
+//cấu hình để tự động gán token cho các request
+builder.Services.AddSwaggerGen(opt =>
+{
+    opt.SwaggerDoc("v1", new OpenApiInfo { Title = "BE03_2025 API", Version = "v1" });
+    opt.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        In = ParameterLocation.Header,
+        Description = "Please enter token",
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        BearerFormat = "JWT",
+        Scheme = "bearer"
+    });
+    opt.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type=ReferenceType.SecurityScheme,
+                    Id="Bearer"
+                }
+            },
+            new string[]{}
+        }
+    });
+});
 
 var app = builder.Build();
 
 
 // Configure the HTTP request pipeline.
+//Khi triển khai trên server sẽ không hiển thị màn hình SwaggerUI
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -77,7 +110,7 @@ if (app.Environment.IsDevelopment())
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseHttpsRedirection();
 
-//app.UseAuthentication();
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

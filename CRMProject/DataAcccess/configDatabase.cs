@@ -1,14 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace DataAcccess
+﻿namespace DataAcccess
 {
-    internal class Class1
-    {
-    }
     //dotnet ef dbcontext scaffold "Data Source=DESKTOP-CVF87RA\MSSQLSERVER2019;Initial Catalog=BE_NET_032025;Integrated Security=True;Trust Server Certificate=True" Microsoft.EntityFrameworkCore.SqlServer -o DBContext --force
 }
 
@@ -46,3 +37,29 @@ namespace DataAcccess
 //    FOREIGN KEY (OrderID) REFERENCES Orders(OrderID),
 //    FOREIGN KEY (ProductID) REFERENCES Products(ProductID)
 //);
+
+//CREATE TABLE Functions (
+//    FunctionID int identity primary key,
+//    FunctionName nvarchar(255),
+//    FunctionCode varchar(255)
+//);
+
+//CREATE TABLE Permissions (
+//    PermissionID int identity primary key,
+//    FunctionID int,
+//    UserID int,
+//    IsInsert bit,
+//    IsUpdate bit,
+//    IsDelete bit,
+//    IsView bit,
+//   FOREIGN KEY (FunctionID) REFERENCES Functions(FunctionID),
+//   FOREIGN KEY (UserID) REFERENCES Users(ID)
+//);
+
+
+
+//github
+
+//git add .
+//git commit -m "Noi dung thay doi"
+//git push

@@ -11,6 +11,7 @@ namespace DataAcccess.RequestData
         public string CustomerName { get; set; }
 
         [RegularExpression(@"^\d+$", ErrorMessage = "Phone number")]
+        [StringLength(10, MinimumLength = 10, ErrorMessage = "ContactNumber must be 10 characters")]
         public string? ContactNumber { get; set; }
         [EmailAddress(ErrorMessage = "Email.")]
         public string? Email { get; set; }
@@ -18,12 +19,12 @@ namespace DataAcccess.RequestData
     }
     public class CreateCustomer
     {
-        public int CustomerId { get; set; }
         [Required(ErrorMessage = "CustomerName is required")]
         [StringLength(50, MinimumLength = 3, ErrorMessage = "CustomerName must be between 3 and 50 characters")]
         public string CustomerName { get; set; }
 
         [RegularExpression(@"^\d+$", ErrorMessage = "Phone number")]
+        [StringLength(10, MinimumLength = 10, ErrorMessage = "ContactNumber must be 10 characters")]
         public string? ContactNumber { get; set; }
         [EmailAddress(ErrorMessage = "Email.")]
         public string? Email { get; set; }

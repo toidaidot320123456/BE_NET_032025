@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using CRMProject.Filter;
 using DataAcccess.Common;
 using DataAcccess.DBContext;
 using DataAcccess.DTO;
@@ -6,13 +7,15 @@ using DataAcccess.IServices;
 using DataAcccess.RequestData;
 using DataAcccess.ResponseData;
 using Microsoft.AspNetCore.Mvc;
+using static Dapper.SqlMapper;
+using System.Security.Claims;
 
 namespace CRMProject.Controllers
 {
     [Route("api/[controller]")]
     //[ApiController] bỏ ApiController, mất đi nhiều tính năng "tự động"
     //nên cần cẩn thận hơn
-    public class CustomerController : ControllerBase
+    public class CustomerController : BaseController
     {
         private readonly ICustomerService _customerService;
         public readonly IMapper _mapper;
@@ -22,6 +25,7 @@ namespace CRMProject.Controllers
             _mapper = mapper;
         }
 
+        [CustomAuthorize("Customer_GetCustomers", "IsView")]
         [HttpPost]
         [Route("GetCustomers")]
         public async Task<ActionResult> GetCustomers()
@@ -32,6 +36,7 @@ namespace CRMProject.Controllers
             return Ok(response);
         }
 
+        [CustomAuthorize("Customer_Insert", "IsInsert")]
         [HttpPost]
         [Route("Insert")]
         public async Task<ActionResult> Insert([FromBody] CreateCustomer customer)
@@ -52,6 +57,7 @@ namespace CRMProject.Controllers
             }
         }
 
+        [CustomAuthorize("Customer_Update", "IsUpdate")]
         [HttpPost]
         [Route("Update")]
         public async Task<ActionResult> Update([FromBody] EditCustomer customer)
@@ -72,6 +78,7 @@ namespace CRMProject.Controllers
             }
         }
 
+        [CustomAuthorize("Customer_Remove", "IsDelete")]
         [HttpGet]
         [Route("Remove")]
         public async Task<ActionResult> Remove([FromQuery] int id)

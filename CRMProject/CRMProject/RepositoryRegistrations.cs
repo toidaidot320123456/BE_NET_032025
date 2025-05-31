@@ -13,6 +13,7 @@ namespace CRMProject
             services.AddScoped<ICustomerRepository, CustomerRepository>();
             services.AddScoped<IOrderRepository, OrderRepository>();
             services.AddScoped<IOrderDetailRepository, OrderDetailRepository>();
+            services.AddScoped<IPermissionRepository, PermissionRepository>();
 
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             return services;
