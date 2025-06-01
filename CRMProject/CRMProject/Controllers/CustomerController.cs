@@ -9,6 +9,9 @@ using DataAcccess.ResponseData;
 using Microsoft.AspNetCore.Mvc;
 using static Dapper.SqlMapper;
 using System.Security.Claims;
+using Microsoft.Extensions.Caching.Distributed;
+using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace CRMProject.Controllers
 {
@@ -19,10 +22,12 @@ namespace CRMProject.Controllers
     {
         private readonly ICustomerService _customerService;
         public readonly IMapper _mapper;
-        public CustomerController(ICustomerService customerService, IMapper mapper)
+        private readonly IDistributedCache _distributedCache;
+        public CustomerController(ICustomerService customerService, IMapper mapper, IDistributedCache distributedCache)
         {
             _customerService = customerService;
             _mapper = mapper;
+            _distributedCache = distributedCache;
         }
 
         [CustomAuthorize("Customer_GetCustomers", "IsView")]
@@ -30,9 +35,24 @@ namespace CRMProject.Controllers
         [Route("GetCustomers")]
         public async Task<ActionResult> GetCustomers()
         {
-            List<Customer> customers = await _customerService.GetAll();
-            var customerDTOs = _mapper.Map<List<CustomerDTO>>(customers);
-            ResponseList<CustomerDTO, int> response = new ResponseList<CustomerDTO, int>(true, MessageResponse.SuccessAction, StatusResponse.Success, customerDTOs, customerDTOs.Count);
+            var keyCache = "Customer_GetCustomers";
+            var cachedData = _distributedCache.GetString(keyCache);
+            List<CustomerDTO> result;
+            if (!string.IsNullOrEmpty(cachedData))
+            {
+                result = JsonConvert.DeserializeObject<List<CustomerDTO>>(cachedData);
+            }
+            else
+            {
+                List<Customer> customers = await _customerService.GetAll();
+                result = _mapper.Map<List<CustomerDTO>>(customers);
+                var cacheOptions = new DistributedCacheEntryOptions
+                {
+                    AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1)
+                };
+                _distributedCache.SetString(keyCache, JsonConvert.SerializeObject(result), cacheOptions);
+            }
+            ResponseList<CustomerDTO, int> response = new ResponseList<CustomerDTO, int>(true, MessageResponse.SuccessAction, StatusResponse.Success, result, result.Count);
             return Ok(response);
         }
 

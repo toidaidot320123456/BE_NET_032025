@@ -45,9 +45,11 @@
 //                var dataCacheJson = JsonConvert.SerializeObject(songuyen);
 //                dataToCache = Encoding.UTF8.GetBytes(dataCacheJson);
 //                _distributedCache.Set("songuyen", dataToCache, options);
+//                _distributedCache.SetString()
+
 
 //                //class tự định nghĩa
-//                Student student = new Student() { Id = 1, Name = "Hà Lan"};
+//                Student student = new Student() { Id = 1, Name = "Hà Lan" };
 //                dataCacheJson = JsonConvert.SerializeObject(student);
 //                dataToCache = Encoding.UTF8.GetBytes(dataCacheJson);
 //                _distributedCache.Set("class", dataToCache, options);
@@ -55,7 +57,7 @@
 
 //                return Ok("Thành công");
 //            }
-//            catch(Exception ex)
+//            catch (Exception ex)
 //            {
 
 //            }

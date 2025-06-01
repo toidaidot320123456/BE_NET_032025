@@ -1,4 +1,5 @@
-﻿using DataAcccess.IServices;
+﻿using CRMProject.Cache;
+using DataAcccess.IServices;
 using DataAcccess.Services;
 
 namespace CRMProject
@@ -11,6 +12,7 @@ namespace CRMProject
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<ICustomerService, CustomerService>();
             services.AddScoped<IOrderService, OrderService>();
+            services.AddScoped<ICacheService, CacheService>();
             return services;
         }
     }

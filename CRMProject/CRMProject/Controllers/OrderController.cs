@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using CRMProject.Cache;
 using DataAcccess.DBContext;
 using DataAcccess.DTO;
 using DataAcccess.IServices;
@@ -11,18 +12,31 @@ namespace CRMProject.Controllers
     public class OrderController : BaseController
     {
         private readonly IOrderService _orderService;
-        public readonly IMapper _mapper;
-        public OrderController(IOrderService orderService, IMapper mapper)
+        private readonly IMapper _mapper;
+        private readonly ICacheService _cacheService;
+        public OrderController(IOrderService orderService, IMapper mapper, ICacheService cacheService)
         {
             _orderService = orderService;
             _mapper = mapper;
+            _cacheService = cacheService;
         }
 
         [HttpPost]
         [Route("GetOrders")]
         public async Task<ActionResult> GetOrders()
         {
-            List<Order> orders = await _orderService.GetAll();
+            var keyCache = "Order_GetOrders";
+            List<Order> orders;
+            var cachedData =  await _cacheService.GetAsync<List<Order>>(keyCache);
+            if (cachedData != null)
+            {
+                orders = cachedData;
+            }
+            else
+            {
+                orders = await _orderService.GetAll();
+                await _cacheService.SetAsync<List<Order>>(keyCache, orders, TimeSpan.FromMinutes(2));
+            }
             ResponseList<Order, int> response = new ResponseList<Order, int>(true, MessageResponse.SuccessAction, StatusResponse.Success, orders, orders.Count);
             return Ok(response);
         }

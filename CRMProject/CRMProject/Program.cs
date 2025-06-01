@@ -46,7 +46,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
         ValidAudience = configuration["Jwt:ValidAudience"],//tên người được sử dụng token
 
         ValidateLifetime = true,//tự động kiểm tra thời hạn của token
-        ClockSkew = TimeSpan.Zero,// bỏ thời gian trễ mặc định (5 phút)
+        ClockSkew = TimeSpan.Zero,// bỏ thời gian trễ mặc định (5 phút) giữa client/server
 
         ValidateIssuerSigningKey = true,//tự động kiểm tra với SecretKey 
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:SecretKey"]))
