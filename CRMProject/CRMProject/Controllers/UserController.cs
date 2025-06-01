@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using CRMProject.Cache;
+using DataAcccess.Common;
 using DataAcccess.DTO;
 using DataAcccess.IServices;
 using DataAcccess.RequestData;
@@ -19,11 +21,13 @@ namespace CRMProject.Controllers
         private readonly IUserService _userService;
         public readonly IMapper _mapper;
         private readonly IConfiguration _configuration;
-        public UserController(IUserService userService, IMapper mapper, IConfiguration configuration)
+        private readonly ICacheService _cacheService;
+        public UserController(IUserService userService, IMapper mapper, IConfiguration configuration, ICacheService cacheService)
         {
             _userService = userService;
             _mapper = mapper;
             _configuration = configuration;
+            _cacheService = cacheService;
         }
         [HttpPost]
         [Route("Login")]
@@ -41,7 +45,8 @@ namespace CRMProject.Controllers
                 {
                     new Claim(ClaimTypes.Name, result.UserName),
                     new Claim(ClaimTypes.PrimarySid, result.Id.ToString()),
-                    new Claim(ClaimTypes.IsPersistent, result.IsAdmin.ToString())
+                    new Claim(ClaimTypes.IsPersistent, result.IsAdmin.ToString()),
+                    new Claim(ClaimTypes.WindowsDeviceClaim, loginRequestData?.DeviceName.ToString())
                 };
 
                 var tokenNew = CreateToken(authClaims);
@@ -55,6 +60,24 @@ namespace CRMProject.Controllers
                     ExpriedTime = expiredRefreshToken,
                     RefreshToken = refreshToken,
                 });
+                
+                //Lưu token vào Redis, thời hạn = thời hạn của token
+                UserSessionDTO userSessionDTO = new UserSessionDTO()
+                {
+                    UserId = result.Id,
+                    Token = token,
+                    CreatedAt = DateTime.Now,
+                    //
+                    BrowserName = loginRequestData.BrowserName,
+                    DeviceID = loginRequestData.DeviceID,
+                    DeviceName = loginRequestData.DeviceName,
+                    IpAddress = loginRequestData.IpAddress,
+                    Location = loginRequestData.Location
+                };
+                var keyCache = string.Format("UserSession_{0}_{1}", userSessionDTO.DeviceName, result.UserName);
+                int.TryParse(_configuration["JWT:TokenValidityInMinutes"], out int tokenValidityInMinutes);
+                await _cacheService.SetAsync<UserSessionDTO>(keyCache, userSessionDTO, TimeSpan.FromMinutes(tokenValidityInMinutes));
+
 
                 response.Data.Token = token;
                 response.Data.RefreshToken = refreshToken;
